@@ -1,9 +1,23 @@
 [tool.poetry]
 name = "treeverse"
 version = "0.1.0"
-description = ""
+description = "A flexible tool for traversing, filtering, and processing file trees"
 authors = ["Arthur Ryzhak <ryzhakar@gmail.com>"]
+license = "AGPL-3.0-or-later"
 readme = "README.md"
+homepage = "https://github.com/ryzhakar/treeverse"
+repository = "https://github.com/ryzhakar/treeverse"
+documentation = "https://github.com/ryzhakar/treeverse#readme"
+keywords = ["file-tree", "traversal", "processing", "filtering", "cli"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Utilities",
+]
 packages = [{include = "treeverse"}]
 
 [tool.poetry.scripts]
@@ -16,7 +30,6 @@ pydantic = "^2.7.4"
 chardet = "^5.2.0"
 python-magic = "^0.4.27"
 pyyaml = "^6.0.1"
-types-pyyaml = "^6.0.12.20240311"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1"
@@ -27,7 +40,7 @@ pytest-cov = "^5.0.0"
 coverage = "^7.5.2"
 pytest = "^8.2.1"
 hypothesis = "^6.102.6"
-
+types-pyyaml = "^6.0.12.20240311"
 
 [build-system]
 requires = ["poetry-core"]
