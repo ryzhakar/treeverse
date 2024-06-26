@@ -9,6 +9,7 @@ from treeverse import FileNode
 from treeverse import process_tree
 from treeverse import reduce_tree
 from treeverse import traverse_tree
+from treeverse.code_loaders import load_callable
 
 app = typer.Typer()
 
@@ -59,7 +60,7 @@ def traverse(  # noqa: WPS211
 ) -> None:
     """Traverse the directory recursively, filtering and processing files."""
     filter_funcs = [
-        _load_callable(path)
+        load_callable(path)
         for path in filter_callback_paths
     ]
     if extensions:
@@ -78,7 +79,7 @@ def traverse(  # noqa: WPS211
         raise typer.Exit(code=1)
 
     if payload_callback_path:
-        payload_callback = _load_callable(payload_callback_path)
+        payload_callback = load_callable(payload_callback_path)
         tree = process_tree(tree, payload_callback)
 
     yaml_output = tree.to_yaml()
@@ -101,16 +102,9 @@ def reduce(
         tree = FileNode.from_yaml(yaml_input)
     except Exception as error:
         raise typer.Exit(code=1) from error
-    reduction_callback = _load_callable(reduction_callback_path)
+    reduction_callback = load_callable(reduction_callback_path)
     yaml_output = reduce_tree(tree, reduction_callback).to_yaml()
     typer.echo(yaml_output)
-
-
-# TODO: move out into utilities
-def _load_callable(callable_path: str) -> Callable:
-    module_path, callable_name = callable_path.rsplit(':', 1)
-    module = __import__(module_path, fromlist=[callable_name])  # noqa: WPS421
-    return getattr(module, callable_name)
 
 
 # TODO: move out into default filters or something
