@@ -1,6 +1,6 @@
 # Treeverse
 
-Treeverse is a Python tool for traversing and processing file trees using custom code.
+Treeverse is a Python tool for traversing, processing, and accumulating data from file trees using custom code.
 
 ## Installation
 
@@ -10,39 +10,72 @@ pip install treeverse
 
 ## Usage
 
-Treeverse operates in two main steps:
+Treeverse operates in three main steps:
 
-1. **Traverse and Process**:
-   ```bash
-   treeverse traverse -p /path/to/your/project -e py -e yaml \
-       -c your_module.py:your_processing_function > processed_tree.yaml
-   ```
+1. **Build**: Traverse the directory and build the file tree
+2. **Process**: Apply custom processing to each node
+3. **Accumulate**: Aggregate data from child nodes to parent nodes
 
-   Options:
-   - `-p, --path`: Specify the path to traverse (default is current directory)
-   - `-e, --extensions`: Specify file extensions to include (can be used multiple times)
-   - `-c, --callback`: Path to the module and function for processing (module.py:function)
+### 1. Build the tree
 
-2. **Reduce Results** (if needed):
-   ```bash
-   cat processed_tree.yaml | treeverse reduce \
-       -c your_module.py:your_reduction_function > results.yaml
-   ```
+```bash
+treeverse build -p /path/to/your/project -e py -e yaml \
+    -c your_module:your_filter_function -o tree.yaml
+```
 
-   Options:
-   - `-c, --callback`: Path to the module and function for reduction
+Options:
+- `-p, --path`: Specify the path to traverse (default is current directory)
+- `-e, --extensions`: Specify file extensions to include (can be used multiple times)
+- `-c, --callback`: Path to filter callback functions (can be used multiple times)
+- `-o, --output`: Output file (default: tree.yaml)
+- `--write-to-stream`: Write output to stdout instead of a file
+
+### 2. Process the tree
+
+```bash
+treeverse process -i tree.yaml -c your_module:your_processing_function -o processed_tree.yaml
+```
+
+Options:
+- `-i, --input`: Input file (default: tree.yaml)
+- `-c, --callback`: Path to the processing function
+- `-o, --output`: Output file (default: processed_tree.yaml)
+- `--read-from-stream`: Read input from stdin instead of a file
+- `--write-to-stream`: Write output to stdout instead of a file
+
+### 3. Accumulate results
+
+```bash
+treeverse accumulate -i processed_tree.yaml -c your_module:your_accumulation_function -o final_result.yaml
+```
+
+Options:
+- `-i, --input`: Input file (default: processed_tree.yaml)
+- `-c, --callback`: Path to the accumulation function
+- `-o, --output`: Output file (default: accumulated_tree.yaml)
+- `--read-from-stream`: Read input from stdin instead of a file
+- `--write-to-stream`: Write output to stdout instead of a file
 
 ## Example Use Case
 
-Process all Python and YAML files in a project with a custom analysis function:
+Process all Python and YAML files in a project, analyze them, and accumulate results:
 
 ```bash
-treeverse traverse -p ~/path/to/your/project -e py -e yaml \
-    -c ~/path/to/your/tools.py:llm_analysis > project_analysis.yaml
+treeverse build -p ~/path/to/your/project -e py -e yaml -o tree.yaml
+treeverse process -i tree.yaml -c ~/path/to/your/tools.py:analyze_file -o processed_tree.yaml
+treeverse accumulate -i processed_tree.yaml -c ~/path/to/your/tools.py:accumulate_results -o final_analysis.yaml
 ```
 
-In this example, `tools.py` would contain a custom `llm_analysis` function for processing files.
+To use streaming for the entire pipeline:
+
+```bash
+treeverse build -p ~/path/to/your/project -e py -e yaml --write-to-stream | \
+treeverse process -c ~/path/to/your/tools.py:analyze_file --read-from-stream --write-to-stream | \
+treeverse accumulate -c ~/path/to/your/tools.py:accumulate_results --read-from-stream > final_analysis.yaml
+```
+
+In this example, `tools.py` would contain custom `analyze_file` and `accumulate_results` functions.
 
 ## Reference Implementations
 
-For examples of callable functions that can be used with Treeverse, check the `simple_callbacks.py` file in the project repository. This file contains reference implementations for processing and reduction functions.
+For examples of callable functions that can be used with Treeverse, check the `simple_callbacks.py` file in the project repository. This file contains reference implementations for filtering, processing, and accumulation functions.
