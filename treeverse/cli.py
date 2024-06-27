@@ -44,8 +44,8 @@ def build(
     ),
     filter_callback_paths: list[str] = typer.Option(
         ...,
-        '--filter-callbacks',
-        '-f',
+        '--callback',
+        '-c',
         help='Paths to additional filter callback functions (module:function)',
         default_factory=list,
     ),
@@ -96,7 +96,7 @@ def process(
     ),
     payload_callback_path: str = typer.Option(
         ...,
-        '--payload-callback',
+        '--callback',
         '-c',
         help='Path to the payload callback function (module:function)',
     ),
@@ -141,8 +141,8 @@ def accumulate(
     ),
     accumulation_callback_path: str = typer.Option(
         ...,
-        '--accumulation-callback',
-        '-a',
+        '--callback',
+        '-c',
         help='Path to the accumulation callback function (module:function)',
     ),
     read_from_stream: bool = typer.Option(
