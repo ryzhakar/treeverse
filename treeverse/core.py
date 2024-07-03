@@ -1,7 +1,6 @@
 """Treeverse library for file tree traversal and manipulation."""
 from __future__ import annotations
 
-import mimetypes
 from collections.abc import Callable
 from collections.abc import Sequence
 from datetime import datetime
@@ -127,12 +126,13 @@ def _build_tree(  # noqa: WPS210
     is_text = _is_text_file(current_path) if is_file else False
 
     file_stat = current_path.stat()
+    textual_info = _get_text_file_info(current_path) if is_text else {}
     file_info = FileInfo(
         full_path=current_path,
         file_size_bytes=file_stat.st_size,
         last_modified=datetime.fromtimestamp(file_stat.st_mtime),
         is_text_file=is_text,
-        **(_get_text_file_info(current_path) if is_text and is_file else {}),
+        **textual_info,
     )
 
     node = FileNode(
@@ -156,20 +156,11 @@ def _build_tree(  # noqa: WPS210
 
 def _is_text_file(file_path: Path) -> bool:
     """Check if a file is likely to be a text file."""
-    mimetypes.init()
-    mime_type, _ = mimetypes.guess_type(file_path)
-
-    if mime_type and mime_type.startswith('text/'):
-        return True
-
-    if mime_type is None:
-        with file_path.open('r', encoding='utf-8') as potential_text:
-            try:
-                return bool(potential_text.read(1024))
-            except UnicodeDecodeError:
-                return False
-
-    return False
+    with file_path.open('r', encoding='utf-8') as potential_text:
+        try:
+            return bool(potential_text.read())
+        except UnicodeDecodeError:
+            return False
 
 
 def _get_text_file_info(file_path: Path) -> dict[str, Any]:

@@ -41,6 +41,7 @@ def build(
         '--text-files-only',
         '-t',
         help='Include only text files',
+        is_flag=False,
     ),
     filter_callback_paths: list[str] = typer.Option(
         ...,
